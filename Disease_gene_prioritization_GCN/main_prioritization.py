@@ -14,19 +14,20 @@ from sklearn import metrics
 import matplotlib.pyplot as plt
 import pandas as pd
 import h5py
-from skchem.metrics import bedroc_score
 import pickle
 
 from decagon.deep.optimizer import DecagonOptimizer
 from decagon.deep.model import DecagonModel
 from decagon.deep.minibatch import EdgeMinibatchIterator
 from decagon.utility import rank_metrics, preprocessing
+from bedroc_score import bedroc_score
 
 os.environ["CUDA_DEVICE_ORDER"] = 'PCI_BUS_ID'
 os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
-config = tf.ConfigProto()
+config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
+tf.compat.v1.disable_eager_execution()
 
 np.random.seed(0)
 
@@ -100,18 +101,18 @@ def get_accuracy_scores(edges_pos, edges_neg, edge_type, name=None):
 
 def construct_placeholders(edge_types):
     placeholders = {
-        'batch': tf.placeholder(tf.int32, name='batch'),
-        'batch_edge_type_idx': tf.placeholder(tf.int32, shape=(), name='batch_edge_type_idx'),
-        'batch_row_edge_type': tf.placeholder(tf.int32, shape=(), name='batch_row_edge_type'),
-        'batch_col_edge_type': tf.placeholder(tf.int32, shape=(), name='batch_col_edge_type'),
-        'degrees': tf.placeholder(tf.int32),
-        'dropout': tf.placeholder_with_default(0., shape=()),
+        'batch': tf.compat.v1.placeholder(tf.int32, name='batch'),
+        'batch_edge_type_idx': tf.compat.v1.placeholder(tf.int32, shape=(), name='batch_edge_type_idx'),
+        'batch_row_edge_type': tf.compat.v1.placeholder(tf.int32, shape=(), name='batch_row_edge_type'),
+        'batch_col_edge_type': tf.compat.v1.placeholder(tf.int32, shape=(), name='batch_col_edge_type'),
+        'degrees': tf.compat.v1.placeholder(tf.int32),
+        'dropout': tf.compat.v1.placeholder_with_default(0., shape=()),
     }
     placeholders.update({
-        'adj_mats_%d,%d,%d' % (i, j, k): tf.sparse_placeholder(tf.float32)
+        'adj_mats_%d,%d,%d' % (i, j, k): tf.compat.v1.sparse_placeholder(tf.float32)
         for i, j in edge_types for k in range(edge_types[i,j])})
     placeholders.update({
-        'feat_%d' % i: tf.sparse_placeholder(tf.float32)
+        'feat_%d' % i: tf.compat.v1.sparse_placeholder(tf.float32)
         for i, _ in edge_types})
     return placeholders
 
@@ -244,10 +245,10 @@ edge_type2decoder = {
 edge_types = {k: len(v) for k, v in adj_mats_orig.items()}
 num_edge_types = sum(edge_types.values())
 print("Edge types:", "%d" % num_edge_types)
-
+print(">>>>>> Before Main")
 if __name__ == '__main__':
-
-    flags = tf.app.flags
+    print(">>>>> Inside Main")
+    flags = tf.compat.v1.app.flags
     FLAGS = flags.FLAGS
     flags.DEFINE_integer('neg_sample_size', 1, 'Negative sample size.')
     flags.DEFINE_float('learning_rate', 0.001, 'Initial learning rate.')
@@ -295,10 +296,10 @@ if __name__ == '__main__':
         )
 
     print("Initialize session")
-    sess = tf.Session()
-    sess.run(tf.global_variables_initializer())
+    sess = tf.compat.v1.Session()
+    sess.run(tf.compat.v1.global_variables_initializer())
     feed_dict = {}
-    saver = tf.train.Saver()
+    saver = tf.compat.v1.train.Saver()
     saver.restore(sess,'./model/model.ckpt')
     feed_dict = minibatch.next_minibatch_feed_dict(placeholders=placeholders)
     feed_dict = minibatch.update_feed_dict(
@@ -319,4 +320,4 @@ if __name__ == '__main__':
     	minibatch.idx2edge_type[3])
 
     print('Saving result...')
-    np.save('./result/prediction.npy', prediction)
+    np.save('prediction.npy', prediction)

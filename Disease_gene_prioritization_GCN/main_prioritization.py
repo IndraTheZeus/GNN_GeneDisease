@@ -22,8 +22,10 @@ from decagon.deep.minibatch import EdgeMinibatchIterator
 from decagon.utility import rank_metrics, preprocessing
 from bedroc_score import bedroc_score
 
+print(">>>>>> Before Main")
+
 os.environ["CUDA_DEVICE_ORDER"] = 'PCI_BUS_ID'
-os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -245,7 +247,7 @@ edge_type2decoder = {
 edge_types = {k: len(v) for k, v in adj_mats_orig.items()}
 num_edge_types = sum(edge_types.values())
 print("Edge types:", "%d" % num_edge_types)
-print(">>>>>> Before Main")
+
 if __name__ == '__main__':
     print(">>>>> Inside Main")
     flags = tf.compat.v1.app.flags

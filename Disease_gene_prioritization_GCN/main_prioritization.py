@@ -177,7 +177,7 @@ gene_network_exp = sp.csc_matrix(gene_feature_exp)
 # // TODO: Explore why 1 - 9 and not 0 - 9
 row_list = [3215, 1137, 744, 2503, 1143, 324, 1188, 4662, 1243]
 gene_feature_list_other_spe = list()
-for i in range(0,9):
+for i in range(1,9):
     dg_ref = f['GenePhene'][i][0]
     disease_gene_adj_tmp = sp.csc_matrix((np.array(f[dg_ref]['data']),
         np.array(f[dg_ref]['ir']), np.array(f[dg_ref]['jc'])),

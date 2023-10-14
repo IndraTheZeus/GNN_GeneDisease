@@ -148,8 +148,11 @@ disease_network_adj = sp.csc_matrix((np.array(f['PhenotypeSimilarities']['data']
     shape=(3215, 3215))
 disease_network_adj = disease_network_adj.tocsr()
 
+# >0.2 values get preserved
 disease_network_adj = network_edge_threshold(disease_network_adj, 0.2)
 
+## NOTE: Gene Disease Adj is 1, 0 matrix, while gene_gene (12331, 12331)
+##        and disease-disease ( 3215, 3215) have edge level values
 
 dg_ref = f['GenePhene'][0][0]
 gene_disease_adj = sp.csc_matrix((np.array(f[dg_ref]['data']),
@@ -157,19 +160,24 @@ gene_disease_adj = sp.csc_matrix((np.array(f[dg_ref]['data']),
     shape=(12331, 3215))
 gene_disease_adj = gene_disease_adj.tocsr()
 
+
+## WHAT DATA is THIS ? 34 novel associtaions of value 1, 0
 novel_associations_adj = sp.csc_matrix((np.array(f['NovelAssociations']['data']),
     np.array(f['NovelAssociations']['ir']), np.array(f['NovelAssociations']['jc'])),
     shape=(12331,3215))
 
+#Feature value of each Gene: 4536 features per gene
 gene_feature_path = './data_prioritization/GeneFeatures.mat'
 f_gene_feature = h5py.File(gene_feature_path,'r')
 gene_feature_exp = np.array(f_gene_feature['GeneFeatures'])
 gene_feature_exp = np.transpose(gene_feature_exp)
 gene_network_exp = sp.csc_matrix(gene_feature_exp)
 
+
+# // TODO: Explore why 1 - 9 and not 0 - 9
 row_list = [3215, 1137, 744, 2503, 1143, 324, 1188, 4662, 1243]
 gene_feature_list_other_spe = list()
-for i in range(1,9):
+for i in range(0,9):
     dg_ref = f['GenePhene'][i][0]
     disease_gene_adj_tmp = sp.csc_matrix((np.array(f[dg_ref]['data']),
         np.array(f[dg_ref]['ir']), np.array(f[dg_ref]['jc'])),

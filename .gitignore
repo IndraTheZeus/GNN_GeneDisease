@@ -6,3 +6,5 @@ Disease_gene_prioritization_GCN-master.zip
 *.pyc
 Disease_gene_prioritization_GCN/macau/
 Disease_gene_prioritization_GCN/prediction.npy
+prediction.npy
+
